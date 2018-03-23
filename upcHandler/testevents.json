@@ -1,0 +1,18 @@
+TestPUT
+{
+  "path": "/upc",
+  "httpMethod": "PUT",
+  "body": "{ \"name\":\"Beets 8.5oz\" , \"highRisk\": \"false\" }",
+  "queryStringParameters": {
+    "upcid": "021130332021"
+  }
+}
+
+TestGET
+{
+  "path": "/upc",
+  "httpMethod": "GET",
+  "queryStringParameters": {
+    "upcid": "021130332021"
+  }
+}
