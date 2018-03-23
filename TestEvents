@@ -1,0 +1,23 @@
+test events
+
+Gettest
+
+{
+  "path": "/notification",
+  "httpMethod": "GET",
+  "queryStringParameters": {
+    "id": "101"
+  }
+}
+
+PutTest
+
+{
+  "path": "/notification",
+  "httpMethod": "PUT",
+  "body": "{ \"quantity\":\"2\" , \"sellByDate\": \"1/2/2018\" , \"timePrior\": \"100\" , \"unitPrice\": \"5\"}",
+  "queryStringParameters": {
+    "id": "101",
+    "upc": "1234567890"
+  }
+}
