@@ -15,7 +15,7 @@ exports.handler = function (event, context, callback) {
 function handleHttpMethod (event, context) {
     const httpMethod = event.httpMethod;
 
-    if (event.path.match(/^\/notification/)) {
+    if (event.path.match(/^\/throwaway/)) {
         if (httpMethod === 'GET') {
             return handleItemsGET(event, context);
             
@@ -30,37 +30,30 @@ function handleHttpMethod (event, context) {
 }
 
 function handleItemsGET (event, context) {
-    
-    var dt = new Date(event.queryStringParameters.deliveryDate);
-    var deliveryDate = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-    
-     const params = {
-  TableName : itemTable,
-  FilterExpression : 'deliveryDate = :key',
-  ExpressionAttributeValues : {':key' : deliveryDate}
-};
-    
+
+    const params = {
+        KeyConditionExpression: 'Id = :key',
+        ExpressionAttributeValues: { ':key': event.queryStringParameters.Id },
+        TableName: itemTable,
+
+    };
+
     console.log('GET query: ' + JSON.stringify(params));
-    
-    doc.scan(params, (err, data) => {
+
+    doc.query(params, (err, data) => {
         if(err) { return errorResponse(context, 'Error:', err); }
         return successResponse(context, data);
-    
-        //delete this comment
+
     });
+
     
 }
 
 function handleItemsPUT (event, context){
-    const notification = JSON.parse(event.body);
+    const throwaway = JSON.parse(event.body);
     
-    var dt = new Date(notification.sellByDate);
-    var sellByDate = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-    dt.setDate( dt.getDate() - notification.daysPrior);
-    var deliveryDate = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
-    
-    dt.setDate(notification.dateOfCreation);
-    var dateOfCreation = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+    var dt = new Date(throwaway.disposalDate);
+    var disposalDate = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
     
     const params = {
         TableName: itemTable,
@@ -68,15 +61,16 @@ function handleItemsPUT (event, context){
             
         },
 
-        UpdateExpression: 'set #a = :val1, #b = :val2, #c = :val3, #d = :val4, #e = :val5, #f = :val6, #g = :val7, #h = :val8, #i = :val9',
-        ExpressionAttributeNames: {'#a': 'item', '#b': 'quantity', '#c': 'unitPrice', '#d': 'sellByDate', '#e': 'daysPrior', '#f': 'deliveryOption', '#g': 'dateOfCreation', '#h': 'memo', '#i': 'deliveryDate' },
-        ExpressionAttributeValues: {':val1': notification.item.item, ':val2': notification.item.quantity, ':val3': notification.item.unitPrice, ':val4': sellByDate, ':val5': notification.daysPrior, ':val6': notification.deliveryOption, ':val7': dateOfCreation, ':val8': notification.memo, ':val9': deliveryDate},
+        UpdateExpression: 'set #a = :val1, #b = :val2, #c = :val3, #d = :val4',
+        ExpressionAttributeNames: {'#a': 'item', '#b': 'quantity', '#c': 'unitPrice', '#d': 'disposalDate'},
+        ExpressionAttributeValues: {':val1': throwaway.item, ':val2': throwaway.quantity, ':val3': throwaway.unitPrice, ':val4': disposalDate},
         //For testing
         ReturnValues: 'ALL_NEW'
         
     };
     
     console.log('Updating notifications:', JSON.stringify(params));
+    
     doc.update(params, (err, data) => {
         if(err) { return errorResponse(context, 'Error: Could not update notifications', err.message) }
         return successResponse(context, {notification: data.Attributes});
@@ -106,4 +100,3 @@ function successResponse(context, body) {
 
     
 }
-

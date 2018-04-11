@@ -1,0 +1,20 @@
+//Test Put request
+
+{
+  "path": "/notification",
+  "httpMethod": "PUT",
+  "body": "{\"daysPrior\":3,\"dateOfCreation\":\"Sun Apr 01 2018 13:14:19 GMT-0500 (Central Daylight Time)\",\"sellByDate\":\"Sun Apr 09 2018 13:14:19 GMT-0500 (Central Daylight Time)\",\"memo\":\"testing\",\"deliveryOption\":\"email\",\"item\":{\"unitPrice\":10,\"item\":{\"name\":\"testitem\",\"isHighRisk\":false,\"upc\":\"12\"},\"quantity\":3}}",
+  "queryStringParameters": {
+    "Id": "0"
+  }
+}
+
+//Test GET request
+
+{
+  "path": "/notification",
+  "httpMethod": "GET",
+  "queryStringParameters": {
+    "deliveryDate": "Sun Apr 07 2018 13:14:19 GMT-0500 (Central Daylight Time)"
+  }
+}

@@ -1,0 +1,20 @@
+//Test PUT Request
+
+{
+  "path": "/throwaway",
+  "httpMethod": "PUT",
+  "body": "{\"disposalDate\":\"Sun Apr 07 2018 13:14:19 GMT-0500 (Central Daylight Time)\",\"unitPrice\":10.00,\"item\":{\"name\":\"Cat food\",\"isHighRisk\":false,\"upc\":\"12203487\"},\"quantity\":3}",
+  "queryStringParameters": {
+    "Id": "101"
+  }
+}
+
+//Test GET request
+
+{
+  "path": "/throwaway",
+  "httpMethod": "GET",
+  "queryStringParameters": {
+    "Id": "101"
+  }
+}
