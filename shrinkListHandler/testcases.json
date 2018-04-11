@@ -1,0 +1,7 @@
+{
+  "path": "/shrink",
+  "httpMethod": "GET",
+  "queryStringParameters": {
+    "Id": "101"
+  }
+}

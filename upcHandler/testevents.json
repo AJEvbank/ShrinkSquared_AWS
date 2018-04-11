@@ -16,3 +16,12 @@ TestGET
     "upcid": "021130332021"
   }
 }
+
+TestUPCDB
+{
+  "path": "/upc",
+  "httpMethod": "GET",
+  "queryStringParameters": {
+    "upcId": "718103101776"
+  }
+}
