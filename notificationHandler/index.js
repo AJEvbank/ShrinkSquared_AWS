@@ -4,6 +4,7 @@ const AWS = require('aws-sdk');
 
 const doc = new AWS.DynamoDB.DocumentClient();
 const itemTable = process.env.ITEM_TABLE;
+const uuidv1 = require('uuid/v1');
 
 exports.handler = function (event, context, callback) {
     console.log('request: ' + JSON.stringify(event));
@@ -29,37 +30,47 @@ function handleHttpMethod (event, context) {
 }
 
 function handleItemsGET (event, context) {
+    
+    var dt = new Date(event.queryStringParameters.deliveryDate);
+    var deliveryDate = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+    
      const params = {
-        KeyConditionExpression: 'id = :key',
-        ExpressionAttributeValues: { ':key': event.queryStringParameters.id },
-        TableName: itemTable,
-        
-    };
+  TableName : itemTable,
+  FilterExpression : 'deliveryDate = :key',
+  ExpressionAttributeValues : {':key' : deliveryDate}
+};
     
     console.log('GET query: ' + JSON.stringify(params));
     
-    doc.query(params, (err, data) => {
+    doc.scan(params, (err, data) => {
         if(err) { return errorResponse(context, 'Error:', err); }
         return successResponse(context, data);
     
-        
+        //delete this comment
     });
     
 }
 
 function handleItemsPUT (event, context){
     const notification = JSON.parse(event.body);
-
+    
+    var dt = new Date(notification.sellByDate);
+    var sellByDate = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+    dt.setDate( dt.getDate() - notification.daysPrior);
+    var deliveryDate = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+    
+    dt.setDate(notification.dateOfCreation);
+    var dateOfCreation = dt.getFullYear() + "/" + (dt.getMonth() + 1) + "/" + dt.getDate();
+    
     const params = {
         TableName: itemTable,
-        Key: { id: event.queryStringParameters.id, 
-        upc: event.queryStringParameters.upc
+        Key: { Id: uuidv1()
             
         },
 
-        UpdateExpression: 'set #a = :val1, #b = :val2, #c = :val3, #d = :val4',
-        ExpressionAttributeNames: {'#a': 'quanity', '#b': 'sellByDate', '#c': 'timePrior', '#d': 'unitPrice' },
-        ExpressionAttributeValues: {':val1': notification.quanity, ':val2': notification.sellByDate, ':val3': notification.timePrior, ':val4': notification.untitPrice},
+        UpdateExpression: 'set #a = :val1, #b = :val2, #c = :val3, #d = :val4, #e = :val5, #f = :val6, #g = :val7, #h = :val8, #i = :val9',
+        ExpressionAttributeNames: {'#a': 'item', '#b': 'quantity', '#c': 'unitPrice', '#d': 'sellByDate', '#e': 'daysPrior', '#f': 'deliveryOption', '#g': 'dateOfCreation', '#h': 'memo', '#i': 'deliveryDate' },
+        ExpressionAttributeValues: {':val1': notification.item.item, ':val2': notification.item.quantity, ':val3': notification.item.unitPrice, ':val4': sellByDate, ':val5': notification.daysPrior, ':val6': notification.deliveryOption, ':val7': dateOfCreation, ':val8': notification.memo, ':val9': deliveryDate},
         //For testing
         ReturnValues: 'ALL_NEW'
         
@@ -74,7 +85,6 @@ function handleItemsPUT (event, context){
     
 }
 
-//function getupcid (path) { return path.match(/upc\/(.*)/)[1] }
 
 function errorResponse(context, logline){
     const response = { statusCode: 404, body: JSON.stringify({ 'Error': 'Could not execute request' }) };
@@ -96,3 +106,4 @@ function successResponse(context, body) {
 
     
 }
+
